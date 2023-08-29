@@ -6,6 +6,7 @@ This repository contains PowerShell scripts and modules that can be used to auto
  -  The Microsoft Store
 
 For use on Windows Server 2022. 
+![Microsoft Store and other Appx Packages on Windows Server 2022](Doc/MsStore-OnWs22.png)
 
 The functions within the scripts can also support other Github repos with AppxPackage releases and any Microsoft Store app if required parameter information is provided.
 
