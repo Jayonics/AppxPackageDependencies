@@ -73,7 +73,7 @@ function CpuArchitectureFilter {
         if(( Select-String $KnownArchitectures -quiet -InputObject $File.Name ) -and ( Select-String $CpuArchitecture -quiet -notmatch -InputObject $File.Name)) {
             Write-Host "$($File.Name) matches a known architecture which isn't the current architecture: $CpuArchitecture"
             Write-Verbose -Message "Removing $($File.Name)"
-            Remove-Item -Path $File.FullName -Force -Verbose
+            Remove-Item -Path $File.FullName -Force
         }
     }
 }
@@ -104,7 +104,7 @@ function Get-RepositoryAssets {
         } else {
             Write-Verbose -Message "Downloading $($LatestReleaseAssetsAPI.Count) assets for $($RepositoryURL.LocalPath)"
             # Make a directory for the repository
-            $RepositoryDirectory = New-Item -Path "$($PSScriptRoot)\$($PackageName)" -ItemType Directory -Force -Verbose
+            $RepositoryDirectory = New-Item -Path "$($PSScriptRoot)\$($PackageName)" -ItemType Directory -Force
             foreach($Asset in $LatestReleaseAssetsAPI) {
                 # If the asset name matches one of the files to download, download it
                 if (Select-String $Files -InputObject $asset.name -Quiet ) {
