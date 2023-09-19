@@ -14,6 +14,12 @@ enum RequestType {
     CategoryID
 }
 
+class MsStorePackage {
+    [uri]$Url
+    [System.IO.FileInfo]$Filename
+}
+
+
 function Get-MicrosoftStoreAssets {
     [CmdletBinding(DefaultParameterSetName = 'PackageFamilyName')]
     param(
@@ -30,14 +36,15 @@ function Get-MicrosoftStoreAssets {
     # If the PackageFamilyName parameter is used, get the URL from the rg-adguard API
     switch ($PSCmdlet.ParameterSetName) {
         'PackageFamilyName' {
+            # Set the ProgressPreference Variable to mitigate slow downloads with Invoke-Webrequest [1]
+            $ProgressPreference = 'SilentlyContinue'
             # Form the URI to get the URL from the rg-adguard API
             $ApiReponse = Invoke-WebRequest `
             -Method:Post `
             -Uri 'https://store.rg-adguard.net/api/GetFiles' `
             -Body "type=$($PSCmdlet.ParameterSetName)&url=$PackageFamilyName&ring=$Ring" `
             -ContentType 'application/x-www-form-urlencoded' `
-            -UseBasicParsing `
-            -Verbose
+            -UseBasicParsing
 
             # Parse the response to get the files and URLs
             $Items = @()
@@ -45,11 +52,10 @@ function Get-MicrosoftStoreAssets {
             for($i = 0;$i -lt $ApiReponse.Links.Count; $i++) {
                 if ($ApiReponse.Links[$i] -like '*.appx*' -or $ApiReponse.Links[$i] -like '*.msix*'){
                     if ($ApiReponse.Links[$i] -like '*_neutral_*' -or $ApiReponse.Links[$i] -like "*_"+$env:PROCESSOR_ARCHITECTURE.Replace("AMD","X").Replace("IA","X")+"_*"){
-                        $Asset = [ordered]@{
-                            'Filename' = ($ApiReponse.Links[$i] | Select-String -Pattern '(?<=noreferrer">).+(?=</a>)').Matches.Value
-                            'DownloadUrl' = ($ApiReponse.Links[$i] | Select-String -Pattern '(?<=a href=").+(?=" r)').Matches.Value
-                        }
-                        $Items += $Asset
+                        $MsStorePackage = [MsStorePackage]::new()
+                        $MsStorePackage.Url = ($ApiReponse.Links[$i] | Select-String -Pattern '(?<=a href=").+(?=" r)').Matches.Value
+                        $MsStorePackage.Filename = ($ApiReponse.Links[$i] | Select-String -Pattern '(?<=noreferrer">).+(?=</a>)').Matches.Value
+                        $Items += $MsStorePackage
                     }
                 }
             }
@@ -78,40 +84,60 @@ function Get-MicrosoftStoreAssets {
     }
 }
 
-$MSPackages = Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.WindowsStore_8wekyb3d8bbwe' -Ring 'RP'
+function Invoke-MsStorePackageDownload {
+    [CmdletBinding()]
+    param (
+        # Array of MsstorePackage instances.
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        [MsStorePackage[]]$Packages,
+        [Parameter(Mandatory=$true)]
+        [System.IO.DirectoryInfo]$Directory,
+        [Parameter(Mandatory=$true)]
+        [String]$AppFileextension,
+        [Parameter(Mandatory=$false)]
+        [String]$DependencyFileextension
+    )
+    # Create the DownloadDirectory if it doesn't exist
+    if ($Directory.Exists -eq $false) {
+        Write-Host -ForegroundColor:Yellow "$($Directory.Name) doesn't exist... Creating..."
+        [System.IO.DirectoryInfo]$Directory = New-Item -Path $Directory -ItemType Directory -Force
+    } else {
+        Write-Host -ForegroundColor:Yellow "$($Directory.Name) already exists..."
+    }
+    # Download the packages
+    foreach($Package in $Packages) {
+        Write-Host -ForegroundColor:Blue "Downloading: $($Package.FileName)"
+        #Write-Host -ForegroundColor:Yellow "Uri: $($Package.Url)"
+        Write-Host -ForegroundColor:Magenta "Destination: $(($Directory).FullName)\$($Package.Filename)"
+        # Set the ProgressPreference Variable to mitigate slow downloads with Invoke-Webrequest [2]
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri:$Package.Url -OutFile "$(($Directory).FullName)\$($Package.Filename)"
+    }
+    # Install the dependencies if a dependency file extension is defined
+    if($null -ne $DependencyFileextension){
+        $Dependencies = $(Get-ChildItem -Filter "*.$($DependencyFileextension)" -File -Path $Directory).FullName
+        foreach($Dependency in $Dependencies) {
+            Write-Host -ForegroundColor:Green "Installing $($Dependency)"
+            Add-AppxProvisionedPackage -Online -PackagePath $Dependency `
+            -SkipLicense 1> $null
+        }
+    }
 
-$MsStoreDownloadPath = New-Item -Path "$($PSScriptRoot)\MicrosoftStore" -ItemType Directory -Force -Verbose
-$MSPackages | % {
-    Write-Verbose -Message "Downloading $($_.FileName)"
-    Invoke-WebRequest -Uri:$_.DownloadUrl -OutFile "$(($MsStoreDownloadPath).FullName)\$($Package.Filename)" -Verbose
+    # Install the App
+    $App = $(Get-ChildItem -Filter "*.$($AppFileextension)" -File -Path $Directory).FullName
+    Write-Host -ForegroundColor:Green "Installing $($App)"
+    Add-AppxProvisionedPackage -Online -PackagePath $App -SkipLicense 1> $null
 }
 
-$Directory = $(Get-ChildItem -Filter 'MicrosoftStore' -Directory -Path $PSScriptRoot).FullName
-$MsixBundle = $(Get-ChildItem -Filter '*.msixbundle' -File -Path $Directory).FullName
-$MsStoreDependencies = $(Get-ChildItem -Filter '*.appx' -File -Path $Directory).FullName
-#$LicenseFile = Get-Item -Path:".\WindowsTerminal\Microsoft.WindowsTerminal_1.17.11461.0_8wekyb3d8bbwe.msixbundle_Windows10_PreinstallKit\1ff951bd438b4b28b40cb1599e7c9f72_License1.xml" -ErrorAction:Throw
+Invoke-MsStorePackageDownload `
+-Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.WindowsStore_8wekyb3d8bbwe' -Ring 'Retail') `
+-Directory:"$($PSScriptRoot)\MicrosoftStore" `
+-AppFileextension:'msixbundle' `
+-DependencyFileextension:'appx'
 
-
-# Install the dependencies
-foreach($Dependency in $MsStoreDependencies) {
-    Write-Verbose -Message "Installing $($Dependency)"
-    Add-AppxProvisionedPackage -Online -PackagePath $Dependency -Verbose `
-    -SkipLicense
-}
-Add-AppxProvisionedPackage -Online -PackagePath $MsixBundle -Verbose `
--SkipLicense
-
-
-# Download the Sysinternals Suite
-$SysinternalsFolder = New-Item -Path "$($PSScriptRoot)\SysinternalsSuite" -ItemType Directory -Force -Verbose
-Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.SysinternalsSuite_8wekyb3d8bbwe' -Ring 'RP' | % {
-    Write-Verbose -Message "Downloading $($_.FileName)"
-    Invoke-WebRequest -Uri:$_.DownloadUrl -OutFile "$(($SysinternalsFolder).FullName)\$($Package.Filename)" -Verbose
-}
-# Install the Sysinternals Suite
-$Package = Get-ChildItem -Filter '*.appx*' -File -Path $SysinternalsFolder
-Write-Verbose -Message "Installing $($Package.FullName)"
-Add-AppxProvisionedPackage -Online -PackagePath $Package.FullName -Verbose `
--SkipLicense
+Invoke-MsStorePackageDownload `
+-Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.SysinternalsSuite_8wekyb3d8bbwe' -Ring 'Retail') `
+-Directory:"$($PSScriptRoot)\SysinternalsSuite" `
+-AppFileextension:'msixbundle'
 
 Write-Host ""
