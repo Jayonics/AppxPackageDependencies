@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-vscode.powershell",
+        "tylerleonhardt.vscode-inline-values-powershell",
+        "github.copilot-chat",
+        "github.copilot",
+        "github.copilot-labs"
+    ]
+}
