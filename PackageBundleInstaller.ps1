@@ -152,32 +152,32 @@ foreach($Key in $Script:Repositories.Keys) {
             $Filter = "Microsoft.WindowsTerminal_*_Windows10*"
             $Directory = $(Get-ChildItem -Filter $Filter -Directory -Path $PSScriptRoot -Recurse).FullName
 
-            Add-AppxProvisionedPackage -Online -PackagePath $(Get-ChildItem -Force -Recurse -Filter "Microsoft.VCLibs*_x64*.appx" -Path:$Directory).FullName -Verbose -LicensePath `
-            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName
+            Add-AppxProvisionedPackage -Online -PackagePath $(Get-ChildItem -Force -Recurse -Filter "Microsoft.VCLibs*_x64*.appx" -Path:$Directory).FullName -LicensePath `
+            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName 1> $null
 
-            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.UI.Xaml*_x64*.appx" -Path:$Directory).FullName -Verbose -LicensePath `
-            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName
+            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.UI.Xaml*_x64*.appx" -Path:$Directory).FullName -LicensePath `
+            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName 1> $null
 
             # Package Install
             $Filter = "WindowsTerminal"
             $Directory = $(Get-ChildItem -Filter $Filter -Directory -Path $PSScriptRoot).FullName
-            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.WindowsTerminal*.msixbundle" -Path:$Directory).FullName -Verbose -LicensePath `
-            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName
+            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.WindowsTerminal*.msixbundle" -Path:$Directory).FullName -LicensePath `
+            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName 1> $null
         }
         "DesktopAppInstaller" {
             # Package Dependencies
             $Filter = "DesktopAppInstaller"
             $Directory = $(Get-ChildItem -Filter $Filter -Directory -Path $PSScriptRoot).FullName
             # Package Install
-            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.DesktopAppInstaller*.msixbundle" -Path:$Directory).FullName -Verbose -LicensePath `
-            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName
+            Add-AppxProvisionedPackage -Online -PackagePath:$(Get-ChildItem -Force -Recurse -Filter "Microsoft.DesktopAppInstaller*.msixbundle" -Path:$Directory).FullName -LicensePath `
+            $(Get-ChildItem -Force -Recurse -Filter "*License*.xml" -Path:$(Get-ChildItem -Filter "$Filter" -Directory).FullName).FullName 1> $null
         }
         "PowerShell" {
             # Package Install
             $Filter = "PowerShell"
             $Directory = $(Get-ChildItem -Filter $Filter -Directory -Path $PSScriptRoot).FullName
-            Add-AppxProvisionedPackage -Online -PackagePath $(Get-ChildItem -Force -Recurse -Filter "PowerShell*.msixbundle" -Path:$Directory).FullName -Verbose `
-            -SkipLicense
+            Add-AppxProvisionedPackage -Online -PackagePath $(Get-ChildItem -Force -Recurse -Filter "PowerShell*.msixbundle" -Path:$Directory).FullName  `
+            -SkipLicense 1> $null
         }
     }
 }
