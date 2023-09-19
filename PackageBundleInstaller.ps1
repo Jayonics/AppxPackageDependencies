@@ -113,6 +113,8 @@ function Get-RepositoryAssets {
                     $AssetURL = $Asset.browser_download_url
                     $AssetLocalPath = Join-Path -Path $RepositoryDirectory -ChildPath $AssetName
                     Write-Verbose -Message "Downloading Asset: $AssetName"
+                    # Set the ProgressPreference Variable to mitigate slow downloads with Invoke-Webrequest [1]
+                    $ProgressPreference = 'SilentlyContinue'
                     Invoke-WebRequest -Uri $AssetURL -OutFile $AssetLocalPath
                 }
             }
