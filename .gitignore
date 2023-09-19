@@ -1,6 +1,7 @@
-./Old
-./DesktopAppInstaller
-./MicrosoftStore
-./PowerShell
-./SysinternalsSuite
-./WindowsTerminal
+Old
+# Testing run output folders
+DesktopAppInstaller
+MicrosoftStore
+PowerShell
+SysinternalsSuite
+WindowsTerminal
