@@ -93,8 +93,8 @@ function Get-RepositoryAssets {
         [System.Uri]$RepositoryReleasesApiUrl = [System.Uri]::new("$($GithubApiUri.AbsoluteUri)$($RepositoryURL.LocalPath)/releases/latest")
 
         # Get the latest release from the repository
-        $LatestReleaseAPI = Invoke-RestMethod -Uri $RepositoryReleasesApiUrl -Headers @{ 'Accept' = 'application/vnd.github+json' } -ContentType 'application/vnd.github+json' -Verbose
-        $LatestReleaseAssetsAPI = Invoke-RestMethod -Uri $LatestReleaseAPI.assets_url -Method Get -Headers @{ 'Accept' = 'application/vnd.github+json' } -ContentType 'application/vnd.github+json' -Verbose
+        $LatestReleaseAPI = Invoke-RestMethod -Uri $RepositoryReleasesApiUrl -Headers @{ 'Accept' = 'application/vnd.github+json' } -ContentType 'application/vnd.github+json'
+        $LatestReleaseAssetsAPI = Invoke-RestMethod -Uri $LatestReleaseAPI.assets_url -Method Get -Headers @{ 'Accept' = 'application/vnd.github+json' } -ContentType 'application/vnd.github+json'
 
         # Download the latest release assets
         # If the list of assets is empty, ignore downloading the assets
