@@ -125,14 +125,14 @@ function Get-RepositoryAssets {
         foreach($ZipFile in $ZipFiles) {
             Write-Verbose -Message "Extracting $($ZipFile.Name)"
             # Create a directory for the ZIP file
-            $ExtractDir = New-Item -Path "$($RepositoryDirectory)\$($ZipFile.BaseName)" -ItemType Directory -Force -Verbose
+            $ExtractDir = New-Item -Path "$($RepositoryDirectory)\$($ZipFile.BaseName)" -ItemType Directory -Force
             Expand-Archive -Path $ZipFile.FullName -DestinationPath $ExtractDir -Force
             if ($?) {
                 Write-Verbose -Message "Successfully extracted $($ZipFile.Name)"
                 # Pass the directory to the CPU Architecture Filter
                 CpuArchitectureFilter -Directory $ExtractDir.FullName
                 # Clean up the ZIP file
-                Remove-Item -Path $ZipFile.FullName -Force -Verbose
+                Remove-Item -Path $ZipFile.FullName -Force
             } else {
                 Write-Warning -Message "Failed to extract $($ZipFile.Name)"
             }
