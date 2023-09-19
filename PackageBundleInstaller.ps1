@@ -71,7 +71,7 @@ function CpuArchitectureFilter {
     foreach($File in $Files) {
         # If the file name matches a known architecture, but not the current architecture, remove it
         if(( Select-String $KnownArchitectures -quiet -InputObject $File.Name ) -and ( Select-String $CpuArchitecture -quiet -notmatch -InputObject $File.Name)) {
-            Write-Host "$($File.Name) matches a known architecture which isn't the current architecture: $CpuArchitecture"
+            Write-Verbose "$($File.Name) matches a known architecture which isn't the current architecture: $CpuArchitecture"
             Write-Verbose -Message "Removing $($File.Name)"
             Remove-Item -Path $File.FullName -Force
         }
