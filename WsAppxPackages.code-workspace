@@ -4,5 +4,23 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {},
+	"extensions": {
+		"recommendations": [
+			"ironmansoftware.powershellprotools",
+			"editorconfig.editorconfig",
+			"oderwat.indent-rainbow",
+			"fabiospampinato.vscode-highlight",
+			"hashicorp.terraform",
+			"codezombiech.gitignore",
+			"hashhar.gitattributes",
+			"mhutchie.git-graph",
+			"ms-azuretools.vscode-docker",
+			"ms-azuretools.vscode-azureterraform",
+			"ms-vscode.vscode-node-azure-pack",
+			"lizebang.bash-extension-pack",
+			"ms-azure-devops.azure-pipelines",
+			"redhat.ansible"
+		]
+	}
 }
