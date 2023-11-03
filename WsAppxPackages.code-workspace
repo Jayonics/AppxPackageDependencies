@@ -20,7 +20,8 @@
 			"ms-vscode.vscode-node-azure-pack",
 			"lizebang.bash-extension-pack",
 			"ms-azure-devops.azure-pipelines",
-			"redhat.ansible"
+			"redhat.ansible",
+			"ms-vscode-remote.vscode-remote-extensionpack"
 		]
 	}
 }
