@@ -7,14 +7,14 @@ $Script:Repositories = [ordered]@{
             '\.msixbundle$'
         )
     }
-    # 'DesktopAppInstaller' = @{
-    #     'URL' = 'https://github.com/microsoft/winget-cli'
-    #     'Files' = @(
-    #         '\.msixbundle',
-    #         'License.?\.xml',
-    #         'Policies\.zip'
-    #     )
-    # }
+    'DesktopAppInstaller' = @{
+        'URL' = 'https://github.com/microsoft/winget-cli'
+        'Files' = @(
+            '\.msixbundle',
+            'License.?\.xml',
+            'Policies\.zip'
+        )
+    }
     'PowerShell' = @{
         'URL' = 'https://github.com/PowerShell/PowerShell'
         'Files' = @(

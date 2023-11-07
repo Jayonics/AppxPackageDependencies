@@ -136,14 +136,14 @@ Invoke-MsStorePackageDownload `
 -AppFileextension:'msixbundle' `
 -DependencyFileextension:'appx'
 
-<#
+# Install the Microsoft Store
 Invoke-MsStorePackageDownload `
 -Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.WindowsStore_8wekyb3d8bbwe' -Ring 'Retail') `
 -Directory:"$($PSScriptRoot)\MicrosoftStore" `
 -AppFileextension:'msixbundle' `
 -DependencyFileextension:'appx'
-#>
 
+# Install the Sysinternals Suite
 Invoke-MsStorePackageDownload `
 -Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.SysinternalsSuite_8wekyb3d8bbwe' -Ring 'Retail') `
 -Directory:"$($PSScriptRoot)\SysinternalsSuite" `
