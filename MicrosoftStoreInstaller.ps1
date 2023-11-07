@@ -129,6 +129,13 @@ function Invoke-MsStorePackageDownload {
     Add-AppxProvisionedPackage -Online -PackagePath $App -SkipLicense 1> $null
 }
 
+# Install the DesktopAppInstaller
+Invoke-MsStorePackageDownload `
+-Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.DesktopAppInstaller_8wekyb3d8bbwe' -Ring 'Retail') `
+-Directory:"$($PSScriptRoot)\DesktopAppInstaller" `
+-AppFileextension:'msixbundle' `
+-DependencyFileextension:'appx'
+
 <#
 Invoke-MsStorePackageDownload `
 -Packages:$(Get-MicrosoftStoreAssets -PackageFamilyName 'Microsoft.WindowsStore_8wekyb3d8bbwe' -Ring 'Retail') `
